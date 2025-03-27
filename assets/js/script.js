@@ -1,19 +1,20 @@
 'use strict';
 
-// element toggle function
+// Element toggle function
 const elementToggleFunc = function (elem) {
   elem.classList.toggle("active");
 };
 
-// sidebar variables
+// Sidebar variables
 const sidebar = document.querySelector("[data-sidebar]");
 const sidebarBtn = document.querySelector("[data-sidebar-btn]");
-// sidebar toggle functionality for mobile
+
+// Sidebar toggle functionality for mobile
 sidebarBtn.addEventListener("click", function () {
   elementToggleFunc(sidebar);
 });
 
-// Testimonials modal (wrapped in a conditional)
+// Testimonials modal (wrapped in a conditional) - unchanged
 const testimonialsItem = document.querySelectorAll("[data-testimonials-item]");
 const modalContainer = document.querySelector("[data-modal-container]");
 const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
@@ -22,15 +23,12 @@ const modalImg = document.querySelector("[data-modal-img]");
 const modalTitle = document.querySelector("[data-modal-title]");
 const modalText = document.querySelector("[data-modal-text]");
 
-// Only execute testimonials code if these elements exist
 if (testimonialsItem.length > 0 && modalContainer && modalCloseBtn && overlay && modalImg && modalTitle && modalText) {
-  // modal toggle function
   const testimonialsModalFunc = function () {
     modalContainer.classList.toggle("active");
     overlay.classList.toggle("active");
   };
 
-  // add click event to all testimonials items
   for (let i = 0; i < testimonialsItem.length; i++) {
     testimonialsItem[i].addEventListener("click", function () {
       modalImg.src = this.querySelector("[data-testimonials-avatar]").src;
@@ -41,12 +39,11 @@ if (testimonialsItem.length > 0 && modalContainer && modalCloseBtn && overlay &&
     });
   }
 
-  // add click event to modal close button and overlay
   modalCloseBtn.addEventListener("click", testimonialsModalFunc);
   overlay.addEventListener("click", testimonialsModalFunc);
 }
 
-// custom select and filter functionality
+// Custom select and filter functionality - unchanged
 const select = document.querySelector("[data-select]");
 const selectItems = document.querySelectorAll("[data-select-item]");
 const selectValue = document.querySelector("[data-select-value]");
@@ -55,7 +52,6 @@ const filterItems = document.querySelectorAll("[data-filter-item]");
 
 select.addEventListener("click", function () { elementToggleFunc(this); });
 
-// add event to all select items
 for (let i = 0; i < selectItems.length; i++) {
   selectItems[i].addEventListener("click", function () {
     let selectedValue = this.innerText.toLowerCase();
@@ -65,7 +61,7 @@ for (let i = 0; i < selectItems.length; i++) {
   });
 }
 
-// filter function for active class toggle
+// Filter function for active class toggle
 const filterFunc = function (selectedValue) {
   for (let i = 0; i < filterItems.length; i++) {
     if (selectedValue === "all") {
@@ -78,9 +74,8 @@ const filterFunc = function (selectedValue) {
   }
 }
 
-// add event to all filter button items for large screens
+// Add event to all filter button items for large screens
 let lastClickedBtn = filterBtn[0];
-
 for (let i = 0; i < filterBtn.length; i++) {
   filterBtn[i].addEventListener("click", function () {
     let selectedValue = this.innerText.toLowerCase();
@@ -92,64 +87,118 @@ for (let i = 0; i < filterBtn.length; i++) {
   });
 }
 
-// contact form variables
+// Contact form variables
 const form = document.querySelector("[data-form]");
 const formInputs = document.querySelectorAll("[data-form-input]");
 const formBtn = document.querySelector("[data-form-btn]");
 
-// add event to all form input fields
-for (let i = 0; i < formInputs.length; i++) {
-  formInputs[i].addEventListener("input", function () {
-    // check form validation
-    if (form.checkValidity()) {
-      formBtn.removeAttribute("disabled");
-    } else {
-      formBtn.setAttribute("disabled", "");
-    }
-  });
+// Add event to all form input fields
+if (form && formInputs && formBtn) {
+  for (let i = 0; i < formInputs.length; i++) {
+    formInputs[i].addEventListener("input", function () {
+      if (form.checkValidity()) {
+        formBtn.removeAttribute("disabled");
+      } else {
+        formBtn.setAttribute("disabled", "");
+      }
+    });
+  }
 }
 
-// page navigation variables
+// Page navigation variables
 const navigationLinks = document.querySelectorAll("[data-nav-link]");
 const pages = document.querySelectorAll("[data-page]");
 
-// add event to all navigation links
+// Add event to all navigation links
 for (let i = 0; i < navigationLinks.length; i++) {
   navigationLinks[i].addEventListener("click", function () {
-    for (let i = 0; i < pages.length; i++) {
-      if (this.innerHTML.toLowerCase() === pages[i].dataset.page) {
-        pages[i].classList.add("active");
-        navigationLinks[i].classList.add("active");
+    const pageName = this.innerHTML.toLowerCase();
+    for (let j = 0; j < pages.length; j++) {
+      if (pageName === pages[j].dataset.page) {
+        pages[j].classList.add("active");
+        navigationLinks[j].classList.add("active");
         window.scrollTo(0, 0);
+        // Trigger skill animation when Resume page is active
+        if (pageName === "resume") {
+          animateSkills();
+        }
       } else {
-        pages[i].classList.remove("active");
-        navigationLinks[i].classList.remove("active");
+        pages[j].classList.remove("active");
+        navigationLinks[j].classList.remove("active");
       }
     }
   });
 }
 
-// Handling projects filter navigation (for both buttons and dropdown)
-const projectFilterBtns = document.querySelectorAll("[data-filter-btn]");
+// Project modal functionality
+const projectItems = document.querySelectorAll("[data-project-details]");
+const projectModalContainer = document.createElement("div");
+projectModalContainer.classList.add("modal-container");
+projectModalContainer.innerHTML = `
+  <div class="overlay" data-project-overlay></div>
+  <section class="testimonials-modal">
+    <button class="modal-close-btn" data-project-close-btn>
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+    <div class="modal-img-wrapper">
+      <figure class="modal-avatar-box">
+        <img src="" alt="" data-project-modal-img>
+      </figure>
+    </div>
+    <div class="modal-content">
+      <h4 class="h3 modal-title" data-project-modal-title></h4>
+      <p data-project-modal-text></p>
+    </div>
+  </section>
+`;
+document.body.appendChild(projectModalContainer);
 
-// Add event listeners for project category filter buttons
-projectFilterBtns.forEach((button) => {
-  button.addEventListener("click", function () {
-    const category = this.dataset.category.toLowerCase();
-    // Update active filter button
-    projectFilterBtns.forEach((btn) => btn.classList.remove("active"));
-    this.classList.add("active");
-    filterFunc(category);
+const projectModal = projectModalContainer.querySelector(".testimonials-modal");
+const projectOverlay = projectModalContainer.querySelector("[data-project-overlay]");
+const projectCloseBtn = projectModalContainer.querySelector("[data-project-close-btn]");
+const projectModalImg = projectModalContainer.querySelector("[data-project-modal-img]");
+const projectModalTitle = projectModalContainer.querySelector("[data-project-modal-title]");
+const projectModalText = projectModalContainer.querySelector("[data-project-modal-text]");
+
+const projectModalFunc = function () {
+  projectModalContainer.classList.toggle("active");
+  projectOverlay.classList.toggle("active");
+};
+
+projectItems.forEach(item => {
+  item.addEventListener("click", function (e) {
+    e.preventDefault();
+    const projectId = this.dataset.projectDetails;
+    const projectImg = this.querySelector("img").src;
+    const projectTitle = this.querySelector(".project-title").innerText;
+    const projectText = this.querySelector(".project-desc").innerText;
+
+    projectModalImg.src = projectImg;
+    projectModalImg.alt = projectTitle;
+    projectModalTitle.innerText = projectTitle;
+    projectModalText.innerText = projectText;
+
+    projectModalFunc();
   });
 });
 
-// Handle filter reset (e.g., when clicking "All")
-const allButton = document.querySelector('[data-filter-btn][data-category="all"]');
-if (allButton) {
-  allButton.addEventListener("click", function () {
-    // Reset the filter to show all projects
-    projectFilterBtns.forEach((btn) => btn.classList.remove("active"));
-    this.classList.add("active");
-    filterFunc("all");
+projectCloseBtn.addEventListener("click", projectModalFunc);
+projectOverlay.addEventListener("click", projectModalFunc);
+
+// Skill progress bar animation
+function animateSkills() {
+  const skillFills = document.querySelectorAll(".skill-progress-fill");
+  skillFills.forEach(fill => {
+    const width = fill.style.width;
+    fill.style.width = "0%";
+    setTimeout(() => {
+      fill.style.transition = "width 1s ease-in-out";
+      fill.style.width = width;
+    }, 100);
   });
+}
+
+// Initial call to animate skills if Resume is the default page
+if (pages[1].classList.contains("active")) {
+  animateSkills();
 }
